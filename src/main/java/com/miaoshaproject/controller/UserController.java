@@ -38,7 +38,7 @@ public class UserController extends BaseController{
     private CommonReturnType login(@RequestParam(name = "telphone")String telphone,
                                    @RequestParam(name = "password")String password) throws BusinessException {
 
-        //入参校验
+        //入参校验d
         if (org.apache.commons.lang3.StringUtils.isEmpty(telphone) ||
                 org.apache.commons.lang3.StringUtils.isEmpty(password)){
             throw new BusinessException(EmBussinessError.PARAMETER_VALIDATION_ERROR);
