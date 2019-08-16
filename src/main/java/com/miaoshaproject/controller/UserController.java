@@ -7,19 +7,23 @@ import com.miaoshaproject.error.EmBussinessError;
 import com.miaoshaproject.response.CommonReturnType;
 import com.miaoshaproject.service.UserService;
 import com.miaoshaproject.service.model.UserModel;
-import org.apache.tomcat.util.security.MD5Encoder;
+import com.miaoshaproject.util.PublicUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 
 @Controller("user")
 @RequestMapping("/user")
-@CrossOrigin
+@CrossOrigin(allowCredentials = "true",allowedHeaders = "*")
 public class UserController extends BaseController{
 
     @Autowired
@@ -28,6 +32,22 @@ public class UserController extends BaseController{
     @Autowired
     private HttpServletRequest httpServletRequest;
 
+    //用户登录接口
+    @RequestMapping(value = "/login",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
+    @ResponseBody
+    private CommonReturnType login(@RequestParam(name = "telphone")String telphone,
+                                   @RequestParam(name = "password")String password) throws BusinessException {
+
+        //入参校验
+        if (org.apache.commons.lang3.StringUtils.isEmpty(telphone) ||
+                org.apache.commons.lang3.StringUtils.isEmpty(password)){
+            throw new BusinessException(EmBussinessError.PARAMETER_VALIDATION_ERROR);
+        }
+
+
+        return CommonReturnType.create(null);
+    }
+
     //用户注册接口
     @RequestMapping(value = "/register",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
@@ -35,8 +55,8 @@ public class UserController extends BaseController{
                                       @RequestParam(name = "otpCode")String otpCode,
                                       @RequestParam(name = "name")String name,
                                       @RequestParam(name = "age")Integer age,
-                                      @RequestParam(name = "gender")Byte gender,
-                                      @RequestParam(name = "password")String password) throws BusinessException {
+                                      @RequestParam(name = "gender")Integer gender,
+                                      @RequestParam(name = "password")String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         //验证手机号和otpcode符合
         String inSessionOtpCode = (String) this.httpServletRequest.getSession().getAttribute(telphone);
         if (!StringUtils.equals(otpCode,inSessionOtpCode)){
@@ -47,10 +67,10 @@ public class UserController extends BaseController{
         UserModel userModel = new UserModel();
         userModel.setName(name);
         userModel.setAge(age);
-        userModel.setGender(gender);
+        userModel.setGender(new Byte(String.valueOf(gender.intValue())));
         userModel.setTelphone(telphone);
-        userModel.setRegisterModel("byphone");
-        userModel.setEncrptPassword(MD5Encoder.encode(password.getBytes()));
+        userModel.setRegisterMode("byphone");
+        userModel.setEncrptPassword(PublicUtil.EncodeByMD5(password));
 
         userService.register(userModel);
 

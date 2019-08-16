@@ -32,7 +32,6 @@ public class BaseController {
             //强转为businessException
             BusinessException businessException = (BusinessException)ex;
 
-
             responseData.put("errCode",businessException.getErrCode());
             responseData.put("errMsg",businessException.getErrMsg());
         }else {
@@ -40,6 +39,8 @@ public class BaseController {
             responseData.put("errMsg",EmBussinessError.UNKNOWN_ERROR.getErrMsg());
         }
 
+        //打印异常信息
+        ex.printStackTrace();
         return CommonReturnType.create(responseData,"fail");
     }
 

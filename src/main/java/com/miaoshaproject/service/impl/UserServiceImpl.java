@@ -8,11 +8,16 @@ import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBussinessError;
 import com.miaoshaproject.service.UserService;
 import com.miaoshaproject.service.model.UserModel;
+import com.miaoshaproject.util.PublicUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -64,12 +69,37 @@ public class UserServiceImpl implements UserService {
         //实现model-->dataobject
         UserDO userDO = converFromModel(userModel);
 
-        userDOMapper.insertSelective(userDO);
+        try {
+            userDOMapper.insertSelective(userDO);
+        }catch (DuplicateKeyException ex){
+            throw new BusinessException(EmBussinessError.PARAMETER_VALIDATION_ERROR,"手机号已注册");
+        }
+
+        userModel.setId(userDO.getId());
 
         UserPasswordDO userPasswordDO = converPassWordFromModel(userModel);
 
         userPasswordDOMapper.insertSelective(userPasswordDO);
+    }
 
+    /**
+     * 用户登录
+     * Created by 刘家辉 on 2019/8/16 15:38
+     */
+    @Override
+    public void validateLogin(String telphone, String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        //根据手机号获取用户信息
+        UserDO userDO = userDOMapper.selectByTelphone(telphone);
+        if (userDO == null){
+            throw new BusinessException(EmBussinessError.USER_LOGIN_FAIL);
+        }
+        UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(userDO.getId());
+        UserModel userModel = convertFromDateObject(userDO,userPasswordDO);
+
+        //比对用户信息内的加密密码是否
+        if (!userModel.getEncrptPassword().equals(PublicUtil.EncodeByMD5(password))){
+            throw new BusinessException(EmBussinessError.USER_LOGIN_FAIL);
+        }
 
     }
 
