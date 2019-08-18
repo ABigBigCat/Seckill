@@ -9,6 +9,8 @@ import com.miaoshaproject.error.EmBussinessError;
 import com.miaoshaproject.service.UserService;
 import com.miaoshaproject.service.model.UserModel;
 import com.miaoshaproject.util.PublicUtil;
+import com.miaoshaproject.validator.ValidationResult;
+import com.miaoshaproject.validator.ValidatorImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserPasswordDOMapper userPasswordDOMapper;
 
+    @Autowired
+    private ValidatorImpl validator;
 
     /**
      * 获取用户信息
@@ -59,11 +63,17 @@ public class UserServiceImpl implements UserService {
         if (userModel == null){
             throw new BusinessException(EmBussinessError.PARAMETER_VALIDATION_ERROR);
         }
-        if (StringUtils.isEmpty(userModel.getName())
-            || userModel.getAge() == null
-            || userModel.getGender() == null
-            || StringUtils.isEmpty(userModel.getTelphone())){
-            throw new BusinessException(EmBussinessError.PARAMETER_VALIDATION_ERROR);
+//        if (StringUtils.isEmpty(userModel.getName())
+//            || userModel.getAge() == null
+//            || userModel.getGender() == null
+//            || StringUtils.isEmpty(userModel.getTelphone())){
+//            throw new BusinessException(EmBussinessError.PARAMETER_VALIDATION_ERROR);
+//        }
+
+        ValidationResult validationResult = validator.validate(userModel);
+
+        if (validationResult.getHasErrors()){
+            throw new BusinessException(EmBussinessError.PARAMETER_VALIDATION_ERROR,validationResult.getErrMsg());
         }
 
         //实现model-->dataobject
@@ -87,7 +97,7 @@ public class UserServiceImpl implements UserService {
      * Created by 刘家辉 on 2019/8/16 15:38
      */
     @Override
-    public void validateLogin(String telphone, String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
+    public UserModel validateLogin(String telphone, String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         //根据手机号获取用户信息
         UserDO userDO = userDOMapper.selectByTelphone(telphone);
         if (userDO == null){
@@ -96,10 +106,11 @@ public class UserServiceImpl implements UserService {
         UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(userDO.getId());
         UserModel userModel = convertFromDateObject(userDO,userPasswordDO);
 
-        //比对用户信息内的加密密码是否
+        //比对用户信息内的加密密码是否和传输进来的密码是否正确
         if (!userModel.getEncrptPassword().equals(PublicUtil.EncodeByMD5(password))){
             throw new BusinessException(EmBussinessError.USER_LOGIN_FAIL);
         }
+        return userModel;
 
     }
 

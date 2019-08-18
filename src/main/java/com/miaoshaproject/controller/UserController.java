@@ -36,7 +36,7 @@ public class UserController extends BaseController{
     @RequestMapping(value = "/login",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     private CommonReturnType login(@RequestParam(name = "telphone")String telphone,
-                                   @RequestParam(name = "password")String password) throws BusinessException {
+                                   @RequestParam(name = "password")String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
 
         //入参校验d
         if (org.apache.commons.lang3.StringUtils.isEmpty(telphone) ||
@@ -44,6 +44,12 @@ public class UserController extends BaseController{
             throw new BusinessException(EmBussinessError.PARAMETER_VALIDATION_ERROR);
         }
 
+        //用户登录服务，用来校验是否合法
+        UserModel userModel = userService.validateLogin(telphone,password);
+
+        //将登录凭证加入到用户登录成功的session内
+        this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
+        this.httpServletRequest.getSession().setAttribute("LOGIN_USER",userModel);
 
         return CommonReturnType.create(null);
     }

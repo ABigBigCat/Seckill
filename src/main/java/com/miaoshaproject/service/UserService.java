@@ -12,6 +12,6 @@ public interface UserService {
 
     void register(UserModel userModel) throws BusinessException;
 
-    void validateLogin(String telphone,String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException;
+    UserModel validateLogin(String telphone,String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException;
 
 }
