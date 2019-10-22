@@ -27,11 +27,19 @@
         <javaClientGenerator type="XMLMAPPER" targetPackage="com.miaoshaproject.dao"  targetProject="src/main/java">
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
-        <table schema="miaosha" tableName="user_info" domainObjectName="UserDO" enableCountByExample="false"
+        <!--<table schema="miaosha" tableName="user_info" domainObjectName="UserDO" enableCountByExample="false"
          enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
          selectByExampleQueryId="false">
         </table>
         <table schema="miaosha" tableName="user_password" domainObjectName="UserPasswordDO" enableCountByExample="false"
+               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false">
+        </table>-->
+        <table schema="miaosha" tableName="item" domainObjectName="ItemDO" enableCountByExample="false"
+               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false">
+        </table>
+        <table schema="miaosha" tableName="item_stock" domainObjectName="ItemStockDO" enableCountByExample="false"
                enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false">
         </table>
