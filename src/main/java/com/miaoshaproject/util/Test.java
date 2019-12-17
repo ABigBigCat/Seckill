@@ -14,7 +14,7 @@ public class Test {
 	 * 读入TXT文件
 	 */
 	public static void readFile() {
-		String pathname = "D:\\0511数据导入\\bank.txt"; // 绝对路径或相对路径都可以，写入文件时演示相对路径,读取以上路径的input.txt文件
+		String pathname = "D:\\0511数据导入\\insurancecid(1).txt"; // 绝对路径或相对路径都可以，写入文件时演示相对路径,读取以上路径的input.txt文件
 		//防止文件建立或读取失败，用catch捕捉错误并打印，也可以throw;
 		//不关闭文件会导致资源的泄露，读写文件都同理
 		//Java7的try-with-resources可以优雅关闭文件，异常时自动关闭文件；详细解读https://stackoverflow.com/a/12665271
@@ -44,7 +44,7 @@ public class Test {
 		FileWriter fw = null;
 		try {
 			//如果文件存在则追加写入，文件不存在则创建
-			File f = new File("D:\\0511数据导入\\bank1.sql");
+			File f = new File("D:\\0511数据导入\\insurancecid.sql");
 			fw = new FileWriter(f,true); //追加的方式
 			//fw = new FileWriter(f,false); //覆盖的方式
 		}catch(IOException e) {
@@ -72,12 +72,12 @@ public class Test {
 		//String sql ="INSERT INTO `bank_account_info`(`cust_id`, `member_card`, `source`, `status`, `is_account_type1`, `account_status1`, `is_account_type2`, `account_status2`, `is_account_type3`, `account_status3`, `creator`, `create_time`, `update_person`, `update_time`, `dr`) VALUES ('1000@1', '@1', 4, 0, 0, 0, 0, 0, 0, 0, 'system', '2019-11-12 00:00:00', NULL, NULL, 0);";
 		//String sql ="UPDATE mm_member_pwd SET dr = 1 where card_code ='@1' and id > 2071 ;";
 		//String sql = "update bank_base_info set bank_name = '@2',remark = '修改支行',update_time = now() where account_id =(select id from bank_account_info where member_card = '@1' and is_account_type2 = 1 and dr = 0) and  bank_account = '@3' and account_type = 2 and dr = 0";
-		String sql ="UPDATE insurance_base_info SET insure_type = 1 where id = '' ;";
+		String sql ="UPDATE insurance_base_info SET cust_id = '@3' where card_code = '@1' and name = '@2';";
 		String target = null;
 		for(int i =0; i<strList.length; i++){
 			target = sql.replace("@1",strList[0].trim()).
-			 					replace("@2",strList[1].trim());
-//								replace("@3",strList[2].trim());
+			 					replace("@2",strList[1].trim()).
+								replace("@3",strList[2].trim());
 //								replace("@4",strList[3].trim());
 		}
 		System.out.println(target);
