@@ -1,7 +1,9 @@
 package com.miaoshaproject.service.impl;
 
 import com.miaoshaproject.dao.OrderDOMapper;
+import com.miaoshaproject.dao.SequenceDOMapper;
 import com.miaoshaproject.dataobject.OrderDO;
+import com.miaoshaproject.dataobject.SequenceDO;
 import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBussinessError;
 import com.miaoshaproject.service.ItemService;
@@ -13,6 +15,7 @@ import com.miaoshaproject.service.model.UserModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -35,6 +38,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderDOMapper orderDOMapper;
+
+    @Autowired
+    private SequenceDOMapper sequenceDOMapper;
 
     @Override
     @Transactional
@@ -66,27 +72,46 @@ public class OrderServiceImpl implements OrderService {
         orderModel.setItemId(itemId);
         orderModel.setAmount(amount);
         orderModel.setItemPrice(itemModel.getPrice());
-        orderModel.setOrderAmount(itemModel.getPrice().multiply(new BigDecimal(amount)));
+        orderModel.setOrderPrice(itemModel.getPrice().multiply(new BigDecimal(amount)));
 
+        orderModel.setId(generateOrderNo());
         OrderDO orderDO = covertFromOrderModel(orderModel);
         orderDOMapper.insertSelective(orderDO);
 
         //返回
 
 
-        return null;
+        return orderModel;
     }
 
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     private String generateOrderNo(){
+        StringBuilder stringBuilder = new StringBuilder();
         //订单号16位
         //前八位为年月日
         LocalDateTime now = LocalDateTime.now();
         String nowDate = now.format(DateTimeFormatter.ISO_DATE).replace("-","");
 
+        stringBuilder.append(nowDate);
+
         //中间六位为自增
-        //后两位为分库分表
-        return null;
+        //获取当前sequence
+        int sequence = 0;
+        SequenceDO sequenceDO = sequenceDOMapper.getSequenceByName("order_info");
+        sequence = sequenceDO.getCurrentValue();
+        sequenceDO.setCurrentValue(sequenceDO.getCurrentValue() + sequenceDO.getStep());
+        sequenceDOMapper.updateByPrimaryKeySelective(sequenceDO);
+        //判断还差多少位，补够6位
+        String sequenceString = String.valueOf(sequence);
+        for (int i = 0;i<6-sequenceString.length();i++){
+            stringBuilder.append(0);
+        }
+        stringBuilder.append(sequence);
+
+        //后两位为分库分表,暂时写死为00
+        stringBuilder.append("00");
+        return stringBuilder.toString();
     }
 
     private OrderDO covertFromOrderModel(OrderModel orderModel){

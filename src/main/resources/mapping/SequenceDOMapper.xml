@@ -19,6 +19,14 @@
     -->
     name, current_value, step
   </sql>
+
+  <select id="getSequenceByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sequence_info
+    where name = #{name,jdbcType=VARCHAR} for update
+  </select>
+
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     <!--
       WARNING - @mbg.generated
