@@ -1,6 +1,7 @@
 package com.miaoshaproject.dao;
 
 import com.miaoshaproject.dataobject.ItemDO;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -60,4 +61,12 @@ public interface ItemDOMapper {
      * @return
      */
     List<ItemDO> listItem();
+
+    /**
+     * 对应的商品销量增加
+     * @param id
+     * @param amount
+     * @return
+     */
+    int increaseSales(@Param("id")Integer id, @Param("amount")Integer amount);
 }

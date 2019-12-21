@@ -6,9 +6,9 @@
 <generatorConfiguration>
     <context id="DB2Tables" targetRuntime="MyBatis3">
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://127.0.0.1:3306/miaosha?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC"
+                        connectionURL="jdbc:mysql://127.0.0.1:3306/miaosha?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true"
                         userId="root"
-                        password="12345">
+                        password="LJH13428273266ro">
         </jdbcConnection>
         <!-- 生成DataObject类存放位置 -->
         <javaModelGenerator targetPackage="com.miaoshaproject.dataobject" targetProject="src/main/java">
@@ -35,7 +35,7 @@
                enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false">
         </table>-->
-        <table schema="miaosha" tableName="sequence_info" domainObjectName="SequenceDO" enableCountByExample="false"
+        <table schema="miaosha" tableName="promo" domainObjectName="PromoDO" enableCountByExample="false"
                enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false">
         </table>

@@ -78,15 +78,16 @@ public class OrderServiceImpl implements OrderService {
         OrderDO orderDO = covertFromOrderModel(orderModel);
         orderDOMapper.insertSelective(orderDO);
 
+        //对应的增加商品的销量
+        itemService.increaseSales(itemId,amount);
+
         //返回
-
-
         return orderModel;
     }
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private String generateOrderNo(){
+    public String generateOrderNo(){
         StringBuilder stringBuilder = new StringBuilder();
         //订单号16位
         //前八位为年月日
