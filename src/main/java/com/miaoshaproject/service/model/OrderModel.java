@@ -21,10 +21,13 @@ public class OrderModel {
     //购买数量
     private Integer amount;
 
-    //购买时的商品价格，即使以后商品价格改动也不影响购买时的价格
+    //活动id,若不为空，则该商品参与活动
+    private Integer promoId;
+
+    //购买时的商品价格，即使以后商品价格改动也不影响购买时的价格，若promoId不为空则为活动价格
     private BigDecimal itemPrice;
 
-    //购买金额
+    //购买金额，若promoId不为空则为活动价格
     private BigDecimal orderPrice;
 
     public String getId() {
@@ -73,5 +76,13 @@ public class OrderModel {
 
     public void setOrderPrice(BigDecimal orderPrice) {
         this.orderPrice = orderPrice;
+    }
+
+    public Integer getPromoId() {
+        return promoId;
+    }
+
+    public void setPromoId(Integer promoId) {
+        this.promoId = promoId;
     }
 }

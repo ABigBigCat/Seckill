@@ -1,8 +1,10 @@
 package com.miaoshaproject.service.impl;
 
 import com.miaoshaproject.dao.OrderDOMapper;
+import com.miaoshaproject.dao.PromoDOMapper;
 import com.miaoshaproject.dao.SequenceDOMapper;
 import com.miaoshaproject.dataobject.OrderDO;
+import com.miaoshaproject.dataobject.PromoDO;
 import com.miaoshaproject.dataobject.SequenceDO;
 import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBussinessError;
@@ -42,9 +44,12 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private SequenceDOMapper sequenceDOMapper;
 
+    @Autowired
+    private PromoDOMapper promoDOMapper;
+
     @Override
     @Transactional
-    public OrderModel createOrder(Integer userId, Integer itemId, Integer amount) throws BusinessException {
+    public OrderModel createOrder(Integer userId, Integer itemId, Integer amount,Integer promoId) throws BusinessException {
         //校验下单状态，商品是否存在，用户是否合法，购买数量是否正确
         ItemModel itemModel = itemService.getItemById(itemId);
         if (itemModel == null){
@@ -60,6 +65,18 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(EmBussinessError.PARAMETER_VALIDATION_ERROR,"数量信息不正确");
         }
 
+        //校验活动
+        if (promoId != null){
+            //校验对应活动是否在存在这个适用商品
+            if (promoId.intValue() != itemModel.getPromoModel().getId()){
+                throw new BusinessException(EmBussinessError.PARAMETER_VALIDATION_ERROR,"活动信息有误");
+                //校验活动是否在进行中
+            }else if (itemModel.getPromoModel().getStatus() != 2){
+                throw new BusinessException(EmBussinessError.PARAMETER_VALIDATION_ERROR,"活动信息有误");
+            }
+        }
+
+
         //下单减库存
         boolean result = itemService.decreaseStock(itemId,amount);
         if (!result){
@@ -71,8 +88,15 @@ public class OrderServiceImpl implements OrderService {
         orderModel.setUserId(userId);
         orderModel.setItemId(itemId);
         orderModel.setAmount(amount);
-        orderModel.setItemPrice(itemModel.getPrice());
-        orderModel.setOrderPrice(itemModel.getPrice().multiply(new BigDecimal(amount)));
+        orderModel.setPromoId(promoId);
+
+        if (promoId != null){
+            orderModel.setItemPrice(itemModel.getPromoModel().getPromoItemPrice());
+        }else {
+            orderModel.setItemPrice(itemModel.getPrice());
+        }
+
+        orderModel.setOrderPrice(orderModel.getItemPrice().multiply(new BigDecimal(amount)));
 
         orderModel.setId(generateOrderNo());
         OrderDO orderDO = covertFromOrderModel(orderModel);

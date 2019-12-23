@@ -41,7 +41,7 @@ public class ItemVO {
     private BigDecimal promoPrice;
 
     //秒杀活动开始时间
-    private DateTime startDate;
+    private String startDate;
 
     public Integer getPromoId() {
         return promoId;
@@ -59,11 +59,11 @@ public class ItemVO {
         this.promoPrice = promoPrice;
     }
 
-    public DateTime getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(DateTime startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
